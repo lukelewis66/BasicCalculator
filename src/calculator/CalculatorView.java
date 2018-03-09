@@ -4,6 +4,7 @@ import static sbcc.Core.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -14,7 +15,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.EmptyBorder;
 
 public class CalculatorView extends JFrame {
-
 	private JPanel panel;
 	private JButton oneButton;
 	private JLabel resultLabel;
@@ -51,11 +51,40 @@ public class CalculatorView extends JFrame {
 	}
 
 
+	void show(double val) {
+		if (val == Math.floor(val)) {
+			int intval = (int) val;
+			resultLabel.setText(Integer.toString(intval));
+		} else {
+			resultLabel.setText(Double.toString(val));
+		}
+	}
+
+
 	double equal() {
 		double operand = Double.parseDouble(cur.toString());
 		double ans = calculator.mathOperation(temp, operand, op);
-		resultLabel.setText(Double.toString(ans));
+		System.out.println("doing " + temp + op + operand);
+		show(ans);
 		return ans;
+	}
+
+
+	void undo() {
+		temp = calculator.undoOperation();
+		System.out.println("temp = " + temp);
+		show(temp);
+	}
+
+
+	void plusminus() {// a multiply operation with operand -1
+		temp = Double.parseDouble(resultLabel.getText());
+		System.out.println("temp = " + temp);
+		cur = new StringBuilder();
+		cur.append("-1");
+		op = '*';
+		mathClick('*');
+		temp = Double.parseDouble(resultLabel.getText());
 	}
 
 
@@ -221,6 +250,7 @@ public class CalculatorView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				temp = equal();
 				cur = new StringBuilder();
+				cur.append(Double.toString(temp));
 				op = ' ';
 			}
 		});
@@ -357,7 +387,7 @@ public class CalculatorView extends JFrame {
 		clearButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				do_clearButton_actionPerformed(e);
+				resultLabel.setText("0");
 			}
 		});
 		clearButton.setBorderPainted(false);
@@ -374,8 +404,7 @@ public class CalculatorView extends JFrame {
 		btnUndo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				temp = calculator.undoOperation();
-				resultLabel.setText(Double.toString(temp));
+				undo();
 			}
 		});
 		btnUndo.setBorderPainted(false);
@@ -392,7 +421,7 @@ public class CalculatorView extends JFrame {
 		plusMinusButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				do_plusMinusButton_actionPerformed(e);
+				plusminus();
 			}
 		});
 		plusMinusButton.setBorderPainted(false);
@@ -434,7 +463,12 @@ public class CalculatorView extends JFrame {
 		saveAsXmlMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				do_saveAsXmlMenuItem_actionPerformed(e);
+				try {
+					calculator.save('X');
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		saveAsXmlMenuItem.setMnemonic('x');
@@ -446,7 +480,12 @@ public class CalculatorView extends JFrame {
 		saveAsTextMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				do_saveAsTextMenuItem_actionPerformed(e);
+				try {
+					calculator.save('T');
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		saveAsTextMenuItem.setMnemonic('t');
@@ -473,113 +512,8 @@ public class CalculatorView extends JFrame {
 	}
 
 
-	protected void do_saveAsXmlMenuItem_actionPerformed(ActionEvent e) {
-		println("Save as XML");
-	}
-
-
-	protected void do_saveAsTextMenuItem_actionPerformed(ActionEvent e) {
-		println("Save as text");
-	}
-
-
 	protected void do_quitMenuItem_actionPerformed(ActionEvent e) {
 		dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 	}
 
-
-	protected void do_oneButton_actionPerformed(ActionEvent e) {
-		println("1 clicked");
-	}
-
-
-	protected void do_zeroButton_actionPerformed(ActionEvent e) {
-		println("0 clicked");
-	}
-
-
-	protected void do_twoButton_actionPerformed(ActionEvent e) {
-		println("2 clicked");
-	}
-
-
-	protected void do_threeButton_actionPerformed(ActionEvent e) {
-		println("3 clicked");
-	}
-
-
-	protected void do_fourButton_actionPerformed(ActionEvent e) {
-		println("4 clicked");
-	}
-
-
-	protected void do_fiveButton_actionPerformed(ActionEvent e) {
-		println("5 clicked");
-	}
-
-
-	protected void do_sixButton_actionPerformed(ActionEvent e) {
-		println("6 clicked");
-	}
-
-
-	protected void do_sevenButton_actionPerformed(ActionEvent e) {
-		println("7 clicked");
-	}
-
-
-	protected void do_eightButton_actionPerformed(ActionEvent e) {
-		println("8 clicked");
-	}
-
-
-	protected void do_nineButton_actionPerformed(ActionEvent e) {
-		println("9 clicked");
-	}
-
-
-	protected void do_clearButton_actionPerformed(ActionEvent e) {
-		println("ac clicked");
-	}
-
-
-	protected void do_btnUndo_actionPerformed(ActionEvent e) {
-		println("undo clicked");
-	}
-
-
-	protected void do_plusMinusButton_actionPerformed(ActionEvent e) {
-		println("± clicked");
-	}
-
-
-	protected void do_divideButton_actionPerformed(ActionEvent e) {
-		println("÷ clicked");
-	}
-
-
-	protected void do_multiplyButton_actionPerformed(ActionEvent e) {
-		println("x clicked");
-	}
-
-
-	protected void do_subtractButton_actionPerformed(ActionEvent e) {
-		println("- clicked");
-	}
-
-
-	protected void do_plusButton_actionPerformed(ActionEvent e) {
-		println("+ clicked");
-
-	}
-
-
-	protected void do_equalsButton_actionPerformed(ActionEvent e) {
-		println("= clicked");
-	}
-
-
-	protected void do_periodButton_actionPerformed(ActionEvent e) {
-		println(". clicked");
-	}
 }

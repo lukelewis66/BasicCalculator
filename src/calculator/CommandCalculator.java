@@ -1,6 +1,8 @@
 package calculator;
 
+import java.io.*;
 import java.util.*;
+import static sbcc.Core.*;
 
 public class CommandCalculator {
 	Stack<MathCommand> mathLog = new Stack<>();
@@ -9,7 +11,8 @@ public class CommandCalculator {
 
 	double mathOperation(double op1, double op2, char operator) {
 		double result = 0.00;
-		switch (operator) {
+		switch (operator) { // basic switch based on what operation the user clicked to determine what kind
+							// of Math Command we need to initialize
 		case '+':
 			MathPlus plusCmd = new MathPlus(op1, op2);
 			result = plusCmd.execute();
@@ -42,11 +45,21 @@ public class CommandCalculator {
 	}
 
 
+	void save(char c) throws IOException {
+		SmartSaver saver = new SmartSaver(commandLog);
+		saver.save(c);
+	}
+
+
 	double undoOperation() {
-		MathCommand mathUndone = mathLog.pop();
-		UndoCommand undone = new UndoCommand();
-		commandLog.push(undone);
-		double result = mathUndone.previous;
-		return result;
+		if (!mathLog.isEmpty()) {
+			MathCommand mathUndone = mathLog.pop();
+			UndoCommand undone = new UndoCommand(mathUndone);
+			commandLog.push(undone);
+			double result = mathUndone.previous;
+			return result;
+		} else { // if our stack is empty we just return 0 and not create a new Undo class
+			return 0.00;
+		}
 	}
 }
