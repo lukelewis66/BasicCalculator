@@ -9,13 +9,13 @@ import org.apache.commons.io.*;
 
 public class SaveTxt implements SaveStrategy {
 
-	Stack<Command> log = new Stack<>();
 	Stack<Command> reverseLog = new Stack<>();
 
 
 	public SaveTxt(Stack<Command> logg) {
-		log = logg;
-		while (log.peek() != null) {
+		Stack<Command> log = (Stack<Command>) logg.clone(); // we have to clone the constructor stack so that we don't
+															// pop off of the original stack
+		while (!log.isEmpty()) {
 			reverseLog.push(log.pop());
 		}
 	}
@@ -24,7 +24,7 @@ public class SaveTxt implements SaveStrategy {
 	@Override
 	public void save() throws IOException {
 		StringBuilder saveSb = new StringBuilder();
-		while (reverseLog.peek() != null) {
+		while (!reverseLog.isEmpty()) {
 			Command command = reverseLog.pop();
 			if (command instanceof MathCommand) {
 				String op;
@@ -41,7 +41,7 @@ public class SaveTxt implements SaveStrategy {
 						+ ((MathCommand) command).result);
 				saveSb.append('\n');
 			} else {
-				saveSb.append("Undo. Result = " + ((UndoCommand) command).undoResult);
+				saveSb.append("UNDO ---> " + ((UndoCommand) command).undoResult);
 				saveSb.append('\n');
 			}
 		}

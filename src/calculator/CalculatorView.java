@@ -42,6 +42,7 @@ public class CalculatorView extends JFrame {
 	double temp;
 	char op = ' ';
 	CommandCalculator calculator = new CommandCalculator();
+	Boolean undone = false;
 
 
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException,
@@ -52,7 +53,7 @@ public class CalculatorView extends JFrame {
 
 
 	void show(double val) {
-		if (val == Math.floor(val)) {
+		if (val == Math.floor(val)) {// checking if our value has any decimals
 			int intval = (int) val;
 			resultLabel.setText(Integer.toString(intval));
 		} else {
@@ -72,6 +73,7 @@ public class CalculatorView extends JFrame {
 
 	void undo() {
 		temp = calculator.undoOperation();
+		undone = true;
 		System.out.println("temp = " + temp);
 		show(temp);
 	}
@@ -85,15 +87,22 @@ public class CalculatorView extends JFrame {
 		op = '*';
 		mathClick('*');
 		temp = Double.parseDouble(resultLabel.getText());
+		op = ' ';
+		cur.append(temp);
 	}
 
 
 	void mathClick(char clicked) {
-		if (op == ' ') {
-			temp = Double.parseDouble(cur.toString());
-		} else {
-			temp = equal();
+		if (!undone) {// undone will be True if there was an undone operation previously, and in this
+						// case we do not want to update our temp variable
+			if (op == ' ') {// there has been no previous operations
+				temp = Double.parseDouble(cur.toString());
+			} else {// if there was a previous operation, op will have a value and we will
+					// automatically do an equals
+				temp = equal();
+			}
 		}
+		undone = false;
 		cur = new StringBuilder();
 		op = clicked;
 	}
